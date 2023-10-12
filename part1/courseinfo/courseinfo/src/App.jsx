@@ -59,6 +59,7 @@ const App = () => {
       <Header course={course} />
       <Content parts={parts} />
       <Total parts={parts} />
+      <Hello name="mike" age={4} />
 
     </div>
   )
