@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react'
 import Persons from './components/persons'
 import Search from './components/search'
 import PersonsForm from './components/personsform'
-import axios from 'axios'
-
+import personsService from './services/persons'
 
 
 const App = () => {
@@ -12,12 +11,29 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(res => {
-        setPersons(res.data)
+    personsService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
       })
   }, [])
+
+  const removePerson = (id) => {
+
+    const personToDelete = persons.find((p) => p.id === id)
+    console.log(personToDelete)
+    if (window.confirm(`Really delete ${personToDelete.name} from the phonebook?`)) {
+      personsService.remove(id).then(() => {
+        personsService.getAll().then((res) => {
+          setPersons(res)
+        })
+      })
+    } else {
+
+    }
+  }
+
+
 
   return (
     <div>
@@ -39,7 +55,7 @@ const App = () => {
       <h2>Numbers</h2>
       <ul>
         {persons.map(persons =>
-          <Persons persons={persons} />
+          <Persons persons={persons} removePerson={() => removePerson(persons.id)} />
         )}
       </ul>
     </div>

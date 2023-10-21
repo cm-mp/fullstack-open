@@ -1,23 +1,31 @@
+import personsService from '../services/persons'
 
 
 const PersonsForm = ({ persons, setPersons, newName, setNewName, newNumber, setNewNumber }) => {
 
+
     const addPerson = (e) => {
         e.preventDefault()
+
         const personObject = {
             name: newName,
-            number: newNumber
+            number: newNumber,
+            id: persons.length * 99 + Math.floor(Math.random() * persons.length),
         }
 
         const existsAlready = persons.find((person) => person.name.toLowerCase() === newName.toLowerCase())
 
 
         if (existsAlready) {
-            alert(`${newName} is already in the phonebook`)
+            confirm(`${newName} is already in the phonebook`)
         }
         else {
-            setPersons(persons.concat(personObject))
-            setNewName('')
+            personsService
+                .create(personObject)
+                .then(() => {
+                    setPersons(persons.concat(personObject))
+                    setNewName('')
+                })
         }
     }
 
