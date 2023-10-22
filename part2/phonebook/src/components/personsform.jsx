@@ -1,11 +1,13 @@
+
 import personsService from '../services/persons'
 
 
 const PersonsForm = ({ persons, setPersons, newName, setNewName, newNumber, setNewNumber }) => {
 
 
-    const addPerson = (e) => {
+    const addPerson = (e, id) => {
         e.preventDefault()
+
 
         const personObject = {
             name: newName,
@@ -13,11 +15,27 @@ const PersonsForm = ({ persons, setPersons, newName, setNewName, newNumber, setN
             id: persons.length * 99 + Math.floor(Math.random() * persons.length),
         }
 
-        const existsAlready = persons.find((person) => person.name.toLowerCase() === newName.toLowerCase())
-
+        const existsAlready = persons.find((person) => {
+            if (person && person.name) {
+                return person.name.toLowerCase() === newName.toLowerCase()
+            }
+        });
 
         if (existsAlready) {
-            confirm(`${newName} is already in the phonebook`)
+            if (confirm(`${newName} is already in the phonebook, update this contact's details?`)) {
+                const changedPerson = { ...existsAlready, number: newNumber }
+                personsService
+                    .update(existsAlready.id, changedPerson)
+                    .then(returnedPerson => {
+                        setPersons(persons.map((p) => (p.id !== existsAlready.id ? p : returnedPerson)))
+                        setNewNumber('')
+                    })
+                    .catch(err => {
+                        console.log('issue updating person :', err)
+                    })
+
+
+            }
         }
         else {
             personsService
@@ -25,6 +43,7 @@ const PersonsForm = ({ persons, setPersons, newName, setNewName, newNumber, setN
                 .then(() => {
                     setPersons(persons.concat(personObject))
                     setNewName('')
+                    setNewNumber('')
                 })
         }
     }
