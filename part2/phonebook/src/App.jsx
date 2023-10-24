@@ -5,10 +5,12 @@ import PersonsForm from './components/personsform'
 import personsService from './services/persons'
 
 
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+
 
   useEffect(() => {
     personsService
@@ -27,6 +29,9 @@ const App = () => {
         personsService.getAll().then((res) => {
           setPersons(res)
         })
+          .catch(err => {
+            alert(`${personToDelete} was already removed from the phonebook`)
+          })
       })
     } else {
 
@@ -39,8 +44,11 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <div>
-        <Search persons={persons} />
+        <Search
+          persons={persons}
+        />
       </div>
+
       <hr />
       <div>
         <PersonsForm
@@ -50,14 +58,20 @@ const App = () => {
           setNewName={setNewName}
           newNumber={newNumber}
           setNewNumber={setNewNumber}
+
         />
       </div>
       <h2>Numbers</h2>
-      <ul>
-        {persons.map(persons =>
-          <Persons persons={persons} removePerson={() => removePerson(persons.id)} />
-        )}
-      </ul>
+      <div>
+        <ul>
+          {persons.map(persons =>
+            <Persons
+              persons={persons}
+              removePerson={() => removePerson(persons.id)}
+            />
+          )}
+        </ul>
+      </div>
     </div>
   )
 }

@@ -1,11 +1,17 @@
-
+import { useState } from 'react'
 import personsService from '../services/persons'
-
+import Notification from './notification'
 
 const PersonsForm = ({ persons, setPersons, newName, setNewName, newNumber, setNewNumber }) => {
 
+    const notifValues = {
+        message: '',
+        display: false
+    }
+    const [successMessage, setSuccessMessage] = useState(notifValues)
+    const [errorMessage, setErrorMessage] = useState(notifValues)
 
-    const addPerson = (e, id) => {
+    const addPerson = (e) => {
         e.preventDefault()
 
 
@@ -29,9 +35,17 @@ const PersonsForm = ({ persons, setPersons, newName, setNewName, newNumber, setN
                     .then(returnedPerson => {
                         setPersons(persons.map((p) => (p.id !== existsAlready.id ? p : returnedPerson)))
                         setNewNumber('')
+                        setSuccessMessage({ message: `Successfully changed details of ${newName}`, display: true })
+                        setTimeout(() => {
+                            setSuccessMessage({ message: '', display: false })
+                        }, 5000)
                     })
                     .catch(err => {
                         console.log('issue updating person :', err)
+                        setErrorMessage({ message: `Error changing contact details of ${newName}`, display: true })
+                        setTimeout(() => {
+                            setErrorMessage({ message: '', display: false })
+                        }, 5000)
                     })
 
 
@@ -61,6 +75,9 @@ const PersonsForm = ({ persons, setPersons, newName, setNewName, newNumber, setN
             <div>
                 name: <input value={newName} onChange={handlePersonChange} />
                 number: <input value={newNumber} onChange={handleNumberChange} />
+            </div>
+            <div>
+                <Notification errorMessage={errorMessage} successMessage={successMessage} />
             </div>
             <div>
                 <button type="submit">add</button>
